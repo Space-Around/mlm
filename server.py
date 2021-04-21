@@ -47,10 +47,51 @@ def activate(key, token):
         bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 1ого уровня за " + config.LVL_1_AMOUNT + "$")
 
 def upgrade(lvl, key, token): 
+    response = paypal.AuthorizeOrder().authorize_order(token, debug=False)
+
+    if response.status_code == 201:
+        authorization_id = response.result.purchase_units[0].payments.authorizations[0].id
+        message_text = ""
+        user_info = db.get_user_info(key)
+
+        if lvl = 2:
+            user_info['lvl_2_payed'] = 1
+            message_text = "Оплата прошла успешна. Активирован 2ой уровень."
+
+            seller = db.get_user_info_by_id(user_info['seller_2_id'])
+
+            create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_2_AMOUNT, False)
+
+            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 2ого уровня за " + config.LVL_2_AMOUNT + "$")
+        
+        if lvl = 3:
+            user_info['lvl_3_payed'] = 1
+            message_text = "Оплата прошла успешна. Активирован 3ий уровень."
+
+            seller = db.get_user_info_by_id(user_info['seller_3_id'])
+
+            create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_3_AMOUNT, False)
+
+            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 3его уровня за " + config.LVL_3_AMOUNT + "$")
+
+        if lvl = 4:
+            user_info['lvl_4_payed'] = 1
+            message_text = "Оплата прошла успешна. Активирован 4ый уровень."
+
+            seller = db.get_user_info_by_id(user_info['seller_4_id'])
+
+            create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_4_AMOUNT, False)
+
+            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 4ого уровня за " + config.LVL_4_AMOUNT + "$")
+
+            
+        user_info['lvl'] = lvl
+        user_info['key_gen'] = 0
+
+        bot.send_message(user_info['tg_chat_id'], message_text)
+        
 
 async def handle(request):
-    # user_action = request.rel_url.query.get('paypal_auth', '')
-    # print(request.rel_url.query.get('PayerID', ''))
 
     token = request.rel_url.query.get('token', '')
     encrypted_key = request.rel_url.query.get('encrypted_key', '')
@@ -63,58 +104,13 @@ async def handle(request):
         activate(key, token)
 
     if action == ACTIONE_UPGRADE_LVL_2:
-        upgrade
-        pass
+        upgrade(2, key, token)
 
     if action == ACTIONE_UPGRADE_LVL_3:
-        pass
+        upgrade(3, key, token)
 
     if action == ACTIONE_UPGRADE_LVL_4:
-        pass
-
-    # if len(token) > 0:
-    #     # response = paypal.AuthorizeOrder().authorize_order(token, debug=False)        
-
-    #     # if response.status_code == 201:
-    #         # conn = sqlite3.connect('paypal.db')
-    #         # c = conn.cursor()
-    #         # res = c.execute("SELECT * FROM orders WHERE ")
-    #         # data = res.fetchall()
-
-    #         # authorization_id = response.result.purchase_units[0].payments.authorizations[0].id
-    #         # if aes.decrypt(data) != False:
-    #         json_data = aes.decrypt(data_key)
-
-    #         print(json_data)
-
-    #         if json_data["pay"]["lvlInfo"]["lvl"][0]["payed"] == 0:
-
-    #             json_data["pay"]["lvlInfo"]["key"]["max"] = 4
-    #             json_data["pay"]["lvlInfo"]["key"]["current"] = 0
-
-    #             json_data["pay"]["lvlInfo"]["lvl"][0]["date"] = datetime.datetime.now().strftime('%Y-%m-%d')
-
-    #             json_data["pay"]["lvlInfo"]["lvl"][0]["payed"] = 1                
-
-    #             # create_response = paypal.CreatePayouts().create_payouts(json_data["pay"]["lvlInfo"]["lvl"][0]["seller"]["paypal"], json_data["pay"]["lvlInfo"]["lvl"][0]["amount"], False)
-
-    #             data_key_new = aes.encrypt(json_data)
-
-    #             bot.send_message(json_data["pay"]["lvlInfo"]["lvl"][0]["seller"]["telegram"]["chatId"], "Пользователь " + json_data["user"]["telegram"]["userName"] + " приобрёл ключ 1ого уровня за " + json_data["pay"]["lvlInfo"]["lvl"][0]["amount"] + "$")
-    #             bot.send_message(chat_id, "Оплата прошла успешна. Активирован 1ый уровень.\n\n Ключ: " + data_key_new)
-
-    #         elif json_data["pay"]["lvlInfo"]["lvl"][1]["payed"] == 0:
-    #             pass
-
-    #         elif json_data["pay"]["lvlInfo"]["lvl"][2]["payed"] == 0:
-    #             pass
-
-    #         elif json_data["pay"]["lvlInfo"]["lvl"][3]["payed"] == 0:
-    #             pass
-
-    #         # bot.send_message(chat_id, "Оплата прошла успешна. Активирован 1ый уровень")
-    #             # cur.execute("UPDATE orders SET id_auth = ?, date_auth = ? WHERE id = ?", (authorization_id, datetime.datetime.now(), res.fetchall()[i][0]))        
-    #             # con.commit()
+        upgrade(4, key, token)
 
     text = "Дождитесь редиректа в telegram"
     return web.Response(text=text)

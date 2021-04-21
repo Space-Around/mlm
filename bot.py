@@ -83,65 +83,7 @@ def gen(data, user_id, user_name, chat_id):
         db.insert_user_info(new_user_info)
 
         bot.send_message(chat_id, "Оправьте ключ новому пользователю для активации.\n\nКлюч: " + key)
-
-
-    # paypal_account = data.split()[0]
-    # email_account = data.split()[1]
-    # else:
-        # bot.send_message(chat_id, "Вы не можете генерировать ключи, так как Вас нету в системе, попросите Ваших друзей или знакомых сгенерировать ключ для Вас")
-
-
-
-    # if aes.decrypt(data_key) != False:
-    #     json_data = aes.decrypt(data_key)
-    #     lvl_index = json_data["pay"]["lvlInfo"]["key"]["current"] - 1
         
-
-    #     if json_data["pay"]["lvlInfo"]["key"]["infinit"] == 1:
-    #         with open("./key_struct.json") as f:
-    #                 data_key_new = json.load(f)
-
-    #         data_key_new["id"] = str(random.randint(1000, 9999)) + str(random.randint(1000, 9999)) + str(random.randint(1000, 9999)) + str(random.randint(1000, 9999))
-    #         data_key_new["user"]["paypal"] = paypal_account
-    #         data_key_new["user"]["email"] = email_account
-            
-    #         data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["telegram"]["userName"] = user_name
-    #         data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["telegram"]["id"] = user_id
-    #         data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["telegram"]["chatId"] = chat_id
-    #         data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["email"] = json_data["user"]["email"]
-    #         data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["paypal"] = json_data["user"]["paypal"]
-
-    #         encrypt_data = aes.encrypt(json.dumps(data_key_new))
-
-    #         bot.send_message(chat_id, "Оправьте ключ новому пользователю для активации.\n\nКлюч: " + encrypt_data)
-
-    #         return
-                
-    #     if json_data["pay"]["lvlInfo"]["lvl"][lvl_index]["payed"] == 1:
-    #         if json_data["pay"]["lvlInfo"]["key"]["current"] <= json_data["pay"]["lvlInfo"]["key"]["max"]:
-    #             json_data["pay"]["lvlInfo"]["key"]["current"] = json_data["pay"]["lvlInfo"]["key"]["current"] + 1
-    #             with open("./key_struct.json") as f:
-    #                 data_key_new = json.load(f)
-
-    #             data_key_new["id"] = str(random.randint(1000, 9999)) + str(random.randint(1000, 9999)) + str(random.randint(1000, 9999)) + str(random.randint(1000, 9999))
-    #             data_key_new["user"]["paypal"] = paypal_account
-    #             data_key_new["user"]["email"] = email_account
-                
-    #             data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["telegram"]["userName"] = user_name
-    #             data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["telegram"]["id"] = user_id
-    #             data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["email"] = json_data["user"]["email"]
-    #             data_key_new["pay"]["lvlInfo"]["lvl"][0]["seller"]["paypal"] = json_data["user"]["paypal"]
-
-    #             encrypt_data = aes.encrypt(json.dumps(data_key_new))
-
-    #             bot.send_message(chat_id, "Оправьте ключ новому пользователю для активации.\n\nКлюч: " + encrypt_data)
-    #             bot.send_message(chat_id, "Оправьте ключ новому пользователю для активации.\n\nКлюч: " + encrypt_data)
-    #         else:
-    #             bot.send_message(chat_id, "Вы достигли максимально количества генерация ключей на данном уровне, чтобы генерировать больше клюей необходимо повысить уровень ключа")
-    #     else:
-    #         bot.send_message(chat_id, "Ваш ключ не активен, необходимо произвести оплату для его активации")
-    # else:
-    #     bot.send_message(chat_id, "Неверный формат ключа")
 
 def upgrade(user_id, user_name, chat_id):
     user_info = db.get_user_info_by_tg_id(user_id)
