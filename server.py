@@ -51,44 +51,68 @@ def upgrade(lvl, key, token):
 
     if response.status_code == 201:
         authorization_id = response.result.purchase_units[0].payments.authorizations[0].id
-        message_text = ""
+        message_text_user_info = ""
+        message_text_seller = ""
+        amount = ""
+
         user_info = db.get_user_info(key)
+        seller = db.get_user_info_by_id(user_info['seller_' + str(lvl) + '_id'])
 
-        if lvl = 2:
-            user_info['lvl_2_payed'] = 1
-            message_text = "Оплата прошла успешна. Активирован 2ой уровень."
+        seller_paypal = seller['paypal']
 
-            seller = db.get_user_info_by_id(user_info['seller_2_id'])
+        if seller['lvl'] == user_info['lvl']:
+            seller_paypal = config.ADMINE_PAYPAL
 
-            create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_2_AMOUNT, False)
+        if (seller['lvl'] == 2 and seller['key_gen'] == 8) or (seller['lvl'] == 3 and seller['key_gen'] == 33):
+            seller_paypal = config.ADMINE_PAYPAL
+            bot.send_message(seller['tg_chat_id'], "Вы достигли максимально количества генерация ключей на 2ом уровне, Вам необходимо повысить уровень при помощи команды /upgrade")
 
-            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 2ого уровня за " + config.LVL_2_AMOUNT + "$")
-        
-        if lvl = 3:
-            user_info['lvl_3_payed'] = 1
-            message_text = "Оплата прошла успешна. Активирован 3ий уровень."
+        seller['key_gen'] = seller['key_gen'] + 1
+        user_info['lvl_' + str(lvl) + '_payed'] = 1
 
-            seller = db.get_user_info_by_id(user_info['seller_3_id'])
-
-            create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_3_AMOUNT, False)
-
-            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 3его уровня за " + config.LVL_3_AMOUNT + "$")
-
-        if lvl = 4:
-            user_info['lvl_4_payed'] = 1
-            message_text = "Оплата прошла успешна. Активирован 4ый уровень."
-
-            seller = db.get_user_info_by_id(user_info['seller_4_id'])
-
-            create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_4_AMOUNT, False)
-
-            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 4ого уровня за " + config.LVL_4_AMOUNT + "$")
+        if lvl == 2:
+            # user_info['lvl_2_payed'] = 1
+            amount = config.LVL_2_AMOUNT
+            message_text_user_info = "Оплата прошла успешна. Активирован 2ой уровень."
+            # seller = db.get_user_info_by_id(user_info['seller_2_id'])
 
             
+            # create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_2_AMOUNT, False)
+            # bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 2ого уровня за " + config.LVL_2_AMOUNT + "$")
+        
+        if lvl == 3:
+            # user_info['lvl_3_payed'] = 1
+            message_text_user_info = "Оплата прошла успешна. Активирован 3ий уровень."
+
+            # seller = db.get_user_info_by_id(user_info['seller_3_id'])
+
+            # create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_3_AMOUNT, False)
+            amount = config.LVL_3_AMOUNT
+            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 3его уровня за " + config.LVL_3_AMOUNT + "$")
+
+        if lvl == 4:
+            # user_info['lvl_4_payed'] = 1
+            message_text_user_info = "Оплата прошла успешна. Активирован 4ый уровень."
+
+            # seller = db.get_user_info_by_id(user_info['seller_4_id'])
+
+            # create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_4_AMOUNT, False)
+            amount = config.LVL_4_AMOUNT
+            # bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 4ого уровня за " + config.LVL_4_AMOUNT + "$")
+        
+
+        create_response = paypal.CreatePayouts().create_payouts(seller_paypal, amount, False)
+
+        message_text_seller = "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ " + str(lvl) + " уровня за " + amount + "$"
+
         user_info['lvl'] = lvl
         user_info['key_gen'] = 0
 
-        bot.send_message(user_info['tg_chat_id'], message_text)
+        db.update_user_info(user_info)
+        db.update_user_info(seller)
+
+        bot.send_message(seller['tg_chat_id'], message_text_seller)
+        bot.send_message(user_info['tg_chat_id'], message_text_user_info)
         
 
 async def handle(request):

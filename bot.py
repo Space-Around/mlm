@@ -17,7 +17,11 @@ def activate(key, user_id, user_name, chat_id):
     if len(key) == 16:
         user_info = db.get_user_info(key)        
 
-        if user_info != False:                         
+        if user_info != False:      
+            # if user_info['seller_1_id'] == db.get_user_info_by_tg_id(user_id)['id']:
+                # bot.send_message(chat_id, "Вы не можете активировать ключ, который сами сгенерировали")
+                # return  
+
             if user_info['lvl_1_payed'] == 1:                
                 bot.send_message(chat_id, "Ваш ключ уже активирован")
                 return                 
@@ -58,7 +62,7 @@ def gen(data, user_id, user_name, chat_id):
 
         user_info = db.get_user_info_by_tg_id(user_id)
         user_info['key_gen'] = user_info['key_gen'] + 1
-        # print(user_info)
+
         db.update_user_info(user_info)
 
         new_user_info = {
@@ -86,7 +90,7 @@ def gen(data, user_id, user_name, chat_id):
         
 
 def upgrade(user_id, user_name, chat_id):
-    user_info = db.get_user_info_by_tg_id(user_id)
+    user_info = db.get_user_info_by_tg_id(user_id)    
 
     if user_info['lvl'] == 1:
         action = "upgrade_to_lvl_2"
@@ -145,8 +149,8 @@ def handler_gen(message):
     user_info = db.get_user_info_by_tg_id(message.from_user.id)
 
     if user_info != False:
-        if (user_info['lvl_1_payed'] == 1):
-            if user_info['lvl'] == 4 or (user_info['lvl'] == 1 and user_info['key_gen'] <= 4)  or (user_info['lvl'] == 2 and user_info['key_gen'] <= 8) or (user_info['lvl'] == 3 and user_info['key_gen'] <= 33):
+        if (user_info['lvl_1_payed'] == 1 and ):
+            if user_info['lvl'] > 1 or (user_info['lvl'] == 1 and user_info['key_gen'] <= 4):
                 bot.send_message(message.chat.id, "Введите PayPal и Email нового пользователя, ответив на это сообщение, в строго заданном формате, соблюдая пробелы.\n\nФормат:\npaypal@example.com mail@example.com") 
             else:
                 bot.send_message(message.chat.id, "Вы достигли максимального количества генераций на данном уровне, воспользуйтьесь командой /upgrade для повышения уровня") 
