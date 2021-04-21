@@ -88,7 +88,6 @@ def gen(data, user_id, user_name, chat_id):
 
         bot.send_message(chat_id, "Оправьте ключ новому пользователю для активации.\n\nКлюч: " + key)
         
-
 def upgrade(user_id, user_name, chat_id):
     user_info = db.get_user_info_by_tg_id(user_id)    
 
@@ -148,8 +147,8 @@ def handler_upgrade(message):
 def handler_gen(message):
     user_info = db.get_user_info_by_tg_id(message.from_user.id)
 
-    if user_info != False:
-        if (user_info['lvl_1_payed'] == 1 and ):
+    if user_info != False:        
+        if (user_info['lvl_1_payed'] == 1):
             if user_info['lvl'] > 1 or (user_info['lvl'] == 1 and user_info['key_gen'] <= 4):
                 bot.send_message(message.chat.id, "Введите PayPal и Email нового пользователя, ответив на это сообщение, в строго заданном формате, соблюдая пробелы.\n\nФормат:\npaypal@example.com mail@example.com") 
             else:
@@ -160,13 +159,8 @@ def handler_gen(message):
         bot.send_message(chat_id, "Вы не можете генерировать ключи, так как Вас нету в системе, попросите Ваших друзей или знакомых сгенерировать ключ для Вас")
 
 
-
 @bot.message_handler(commands=['info'])
 def handler_info(message):
-    pass
-
-@bot.message_handler(commands=['pay'])
-def handler_pay(message):
     pass
 
 

@@ -38,6 +38,8 @@ def activate(key, token):
         user_info['key_gen'] = 0
         user_info['lvl'] = 1
 
+        db.update_user_info(user_info)
+
         bot.send_message(user_info['tg_chat_id'], "Оплата прошла успешна. Активирован 1ый уровень.")
 
         seller = db.get_user_info_by_id(user_info['seller_1_id'])
@@ -59,59 +61,47 @@ def upgrade(lvl, key, token):
         seller = db.get_user_info_by_id(user_info['seller_' + str(lvl) + '_id'])
 
         seller_paypal = seller['paypal']
+        
+        if lvl == 2:
+            amount = config.LVL_2_AMOUNT
+            message_text_user_info = "Оплата прошла успешна. Активирован 2ой уровень."
+        
+        if lvl == 3:
+            amount = config.LVL_3_AMOUNT
+            message_text_user_info = "Оплата прошла успешна. Активирован 3ий уровень."
+
+        if lvl == 4:
+            amount = config.LVL_4_AMOUNT
+            message_text_user_info = "Оплата прошла успешна. Активирован 4ый уровень."
+
 
         if seller['lvl'] == user_info['lvl']:
             seller_paypal = config.ADMINE_PAYPAL
 
         if (seller['lvl'] == 2 and seller['key_gen'] == 8) or (seller['lvl'] == 3 and seller['key_gen'] == 33):
             seller_paypal = config.ADMINE_PAYPAL
-            bot.send_message(seller['tg_chat_id'], "Вы достигли максимально количества генерация ключей на 2ом уровне, Вам необходимо повысить уровень при помощи команды /upgrade")
-
-        seller['key_gen'] = seller['key_gen'] + 1
-        user_info['lvl_' + str(lvl) + '_payed'] = 1
-
-        if lvl == 2:
-            # user_info['lvl_2_payed'] = 1
-            amount = config.LVL_2_AMOUNT
-            message_text_user_info = "Оплата прошла успешна. Активирован 2ой уровень."
-            # seller = db.get_user_info_by_id(user_info['seller_2_id'])
-
+            bot.send_message(seller['tg_chat_id'], "Пользователь хотел преобрести у Вас ключ, но у Вы достигли лимита генераций ключей, повысте уровень при помощи команды /upgrade")        
+        else:
+            message_text_seller = "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ " + str(lvl) + " уровня за " + amount + "$"
+            bot.send_message(seller['tg_chat_id'], message_text_seller)
             
-            # create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_2_AMOUNT, False)
-            # bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 2ого уровня за " + config.LVL_2_AMOUNT + "$")
-        
-        if lvl == 3:
-            # user_info['lvl_3_payed'] = 1
-            message_text_user_info = "Оплата прошла успешна. Активирован 3ий уровень."
+            seller['key_gen'] = seller['key_gen'] + 1
 
-            # seller = db.get_user_info_by_id(user_info['seller_3_id'])
+            db.update_user_info(seller)
 
-            # create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_3_AMOUNT, False)
-            amount = config.LVL_3_AMOUNT
-            bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 3его уровня за " + config.LVL_3_AMOUNT + "$")
-
-        if lvl == 4:
-            # user_info['lvl_4_payed'] = 1
-            message_text_user_info = "Оплата прошла успешна. Активирован 4ый уровень."
-
-            # seller = db.get_user_info_by_id(user_info['seller_4_id'])
-
-            # create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_4_AMOUNT, False)
-            amount = config.LVL_4_AMOUNT
-            # bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 4ого уровня за " + config.LVL_4_AMOUNT + "$")
-        
+            if (seller['lvl'] == 2 and seller['key_gen'] == 8) or (seller['lvl'] == 3 and seller['key_gen'] == 33):
+                bot.send_message(seller['tg_chat_id'], "Вы достигли лимита генераций ключей на текухем уровне, повысте уровень при помощи команды /upgrade")        
 
         create_response = paypal.CreatePayouts().create_payouts(seller_paypal, amount, False)
 
-        message_text_seller = "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ " + str(lvl) + " уровня за " + amount + "$"
+        user_info['lvl_' + str(lvl) + '_payed'] = 1
+
 
         user_info['lvl'] = lvl
         user_info['key_gen'] = 0
 
         db.update_user_info(user_info)
-        db.update_user_info(seller)
 
-        bot.send_message(seller['tg_chat_id'], message_text_seller)
         bot.send_message(user_info['tg_chat_id'], message_text_user_info)
         
 
