@@ -1,0 +1,10 @@
+TOKEN = "1724966859:AAGp0Z1LvXeITNkuORQhabRenNfJ4i19PT8"
+DATA_DETECTION = "hrpo"
+DATA_KEY = b"Sixteen byte key"
+
+DB_NAME = "mlm.sqlite"
+
+LVL_1_AMOUNT = "65"
+LVL_2_AMOUNT = "75"
+LVL_3_AMOUNT = "85"
+LVL_4_AMOUNT = "95"

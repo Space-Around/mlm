@@ -1,0 +1,88 @@
+{
+	"id": "",
+	"use_last_date": "",
+	"user": {
+		"paypal": "",
+		"email": "",
+		"telegram": {
+			"userName": "",
+			"id": "",
+			"chatId": ""
+		},
+		"role": 0
+	},	
+	"pay": {
+		"lvlInfo": {
+			"current": 1,
+			"key": {
+				"max": 0,
+				"current": 0,
+				"infinit": 0
+			},		
+			"lvl": [{
+				"date": "",
+				"amount": "65",
+				"payed": 0,
+				"seller": {
+					"telegram": {
+						"userName": "",
+						"id": "",
+						"chatId": ""
+
+					},
+					"email": "",
+					"paypal": ""
+				}
+			},{
+				"date": "",
+				"amount": "70",	
+				"payed": 0,
+				"seller": {
+					"telegram": {
+						"userName": "",
+						"id": "",
+						"chatId": ""
+					},
+					"email": "",
+					"paypal": ""
+				}	
+			},{
+				"date": "",
+				"amount": "80",	
+				"payed": 0,
+				"seller": {
+					"telegram": {
+						"userName": "",
+						"id": "",
+						"chatId": ""
+					},
+					"email": "",
+					"paypal": ""
+				}	
+			},{
+				"date": "",
+				"amount": "90",	
+				"payed": 0,
+				"seller": {
+					"telegram": {
+						"userName": "",
+						"id": "",
+						"chatId": ""
+					},
+					"email": "",
+					"paypal": ""
+				}	
+			}]		
+		},
+		"help": {
+			"admin": [{
+				"telegram": {
+					"userName": "",
+					"id": "",
+					"chatId": ""
+				},
+				"email": ""
+			}]
+		}
+	}
+}
