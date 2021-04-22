@@ -18,11 +18,15 @@ bot.remove_webhook()
 def activate(key, user_id, user_name, chat_id):        
     if len(key) == 16:
         user_info = db.get_user_info(key)        
-
+        print(1234)
         if user_info != False:      
             # if user_info['seller_1_id'] == db.get_user_info_by_tg_id(user_id)['id']:
                 # bot.send_message(chat_id, "Вы не можете активировать ключ, который сами сгенерировали")
                 # return  
+
+            if (db.get_user_info_by_tg_id(user_id)['key'] != key) and (len(db.get_user_info_by_key(key)['tg_user_id']) > 0):
+                bot.send_message(chat_id, "Вы патаетесь активировать ключ другого пользователя")
+                return
 
             if user_info['lvl_1_payed'] == 1:                
                 bot.send_message(chat_id, "Ваш ключ уже активирован")
@@ -179,7 +183,7 @@ def handler_info(message):
 
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
-    activate_reply = "Втавьте ключ для его активации, ответив на это сообщение"
+    activate_reply = "Втавьте ключ для его активации, ответив на это сообщение, активировав ключ Вы соглашаетесь со всеми условиями использования бота"
     gen_reply = "Введите PayPal и Email нового пользователя, ответив на это сообщение, в строго заданном формате, соблюдая пробелы.\n\nФормат:\npaypal@example.com mail@example.com"
 
     chat_id = message.chat.id
