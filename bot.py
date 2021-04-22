@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 import telebot
 from Crypto.Cipher import AES
 import json
@@ -91,36 +93,44 @@ def gen(data, user_id, user_name, chat_id):
 def upgrade(user_id, user_name, chat_id):
     user_info = db.get_user_info_by_tg_id(user_id)    
 
-    if user_info['lvl'] == 1:
+    if user_info['lvl'] == 1 and user_info['key_gen'] == 4:
         action = "upgrade_to_lvl_2"
         encrypted_key = aes.encrypt(user_info['key'] + " " + action)
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_2_AMOUNT, debug=False)
+        bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
     
-    if user_info['lvl'] == 2:
+    if user_info['lvl'] == 2 and user_info['key_gen'] == 8:
         action = "upgrade_to_lvl_3"
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_3_AMOUNT, debug=False)
+        bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
+    else:
+        bot.send_message(chat_id, "")
 
-    if user_info['lvl'] == 3:
+    if user_info['lvl'] == 3 and user_info['key_gen'] == 33:
         action = "upgrade_to_lvl_4"
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_4_AMOUNT, debug=False)
-
-
-    bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
+        bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
     
 
 @bot.message_handler(commands=['start'])
 def handler_start(message):
-    print(message)
+    chat_id = message.chat.id
+    user_name = message.from_user.username
+
+    bot.send_message(chat_id, "Здравствуй, " + user_name + "! Если у тебя уже есть ключ, то воспользуйся командой /activate")
 
 @bot.message_handler(commands=['help'])
 def handler_help(message):
-    pass
+    chat_id = message.chat.id
+    user_name = message.from_user.username
+    message_text = "Если у Вас возникли какие-то проблемы, тогда Вы можете связаться с администрацией.\nTelegram: " + config.ADMINE_TELEGRAM + "\nEmail: " + config.ADMINE_EMAIL + "\n\nОписание команд:\nstart - Приветсвенное сообщение, сообщающее о согласии пользователя с условиями использования бота\nhelp - Получить контакты для связи с администрацией, также узнать подробное описание всех комманд\nactivate - Активация ключа, используется один раз перед началом работы с ботом для последующей генерации ключей\nupgrade - Увеличить свой уровень на один, используется, только в том случае, когда пользователь достиг максимального количества генераций ключей на текущем уровне\ngen - Генерация ключа, используется исключительно для создания ключей первого уровня\ninfo - Получить детальную информацию о ключе\n\nFAQ's:\n1)Как отвечать на сообщения?\nWindows и Linux:\nНажативем правой кнопки мыши на сообщение, после чего появиться всплывающее меню с пунктом Ответить\nAndroid и IOS:\nКороткое нажатие на сообщение, после чего появится всплывающее меню с пунктом Ответить/Reply\n2)Как изменить свой PayPal:\n Свяжитесь с данной к просьбой к администратору\n3)Как изменить свой Email:\nСвяжитесь с данной к просьбой к администратору\n4)Как вернуть денежные средства после активации или покупки нового уровня:\nДанной возможности нету, ознакомьтесь с условиями соглашения"
+    bot.send_message(chat_id, message_text)
 
 @bot.message_handler(commands=['activate'])
 def handler_activate(message):   
     chat_id = message.chat.id
 
-    bot.send_message(chat_id, "Втавьте ключ для его активации, ответив на это сообщение")
+    bot.send_message(chat_id, "Втавьте ключ для его активации, ответив на это сообщение, активировав ключ Вы соглашаетесь со всеми условиями использования бота")
 
 
 @bot.message_handler(commands=['upgrade'])
@@ -139,8 +149,7 @@ def handler_upgrade(message):
         bot.send_message(chat_id, "Вы достигли максимального уровня")
         return    
 
-    upgrade(user_id, user_name, chat_id)
-    
+    upgrade(user_id, user_name, chat_id)    
 
 
 @bot.message_handler(commands=['gen'])
@@ -161,7 +170,11 @@ def handler_gen(message):
 
 @bot.message_handler(commands=['info'])
 def handler_info(message):
-    pass
+    user_id = message.from_user.id
+    chat_id = message.chat.id
+    user_info = db.get_user_info_by_tg_id(user_id)
+
+    bot.send_message(chat_id, "Информация о ключе:\nУровень: " + str(user_info['lvl']) + "\nСгенерированно на данном уровне: " + str(user_info['key_gen']) + "\nКлюч: " + user_info['key'] + "\nPayPal: "+ user_info['paypal'] + "\nEmail: " + user_info['email'])
 
 
 @bot.message_handler(content_types=['text'])

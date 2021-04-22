@@ -10,3 +10,6 @@ LVL_3_AMOUNT = "85"
 LVL_4_AMOUNT = "95"
 
 ADMINE_PAYPAL = ""
+
+ADMINE_TELEGRAM = "SpaceAround101"
+ADMINE_EMAIL = "ViksnaMax@mail.ru"
