@@ -18,19 +18,22 @@ bot.remove_webhook()
 def activate(key, user_id, user_name, chat_id):        
     if len(key) == 16:
         user_info = db.get_user_info(key)        
-        print(1234)
+        
         if user_info != False:      
-            # if user_info['seller_1_id'] == db.get_user_info_by_tg_id(user_id)['id']:
-                # bot.send_message(chat_id, "Вы не можете активировать ключ, который сами сгенерировали")
-                # return  
+            seller = db.get_user_info_by_tg_id(user_id)
+            
+            if seller != False:
+                if user_info['seller_1_id'] == seller['id']:
+                    bot.send_message(chat_id, "Вы не можете активировать ключ, который сами сгенерировали")
+                    return  
 
-            if (db.get_user_info_by_tg_id(user_id)['key'] != key) and (len(db.get_user_info_by_key(key)['tg_user_id']) > 0):
-                bot.send_message(chat_id, "Вы патаетесь активировать ключ другого пользователя")
-                return
+                if (db.get_user_info_by_tg_id(user_id)['key'] != key) and (len(db.get_user_info_by_key(key)['tg_user_id']) > 0):
+                    bot.send_message(chat_id, "Вы патаетесь активировать ключ другого пользователя")
+                    return
 
-            if user_info['lvl_1_payed'] == 1:                
-                bot.send_message(chat_id, "Ваш ключ уже активирован")
-                return                 
+                if user_info['lvl_1_payed'] == 1:                
+                    bot.send_message(chat_id, "Ваш ключ уже активирован")
+                    return                 
             
             user_info['tg_user_id'] = user_id
             user_info['tg_user_name'] = user_name
@@ -103,25 +106,28 @@ def upgrade(user_id, user_name, chat_id):
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_2_AMOUNT, debug=False)
         bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
     
-    if user_info['lvl'] == 2 and user_info['key_gen'] == 8:
+    elif user_info['lvl'] == 2 and user_info['key_gen'] == 8:
         action = "upgrade_to_lvl_3"
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_3_AMOUNT, debug=False)
-        bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
-    else:
-        bot.send_message(chat_id, "")
+        bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)  
 
-    if user_info['lvl'] == 3 and user_info['key_gen'] == 33:
+    elif user_info['lvl'] == 3 and user_info['key_gen'] == 33:
         action = "upgrade_to_lvl_4"
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_4_AMOUNT, debug=False)
         bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
+    else:
+        bot.send_message(chat_id, "Вы не можете повысить уровень, необходимо достигнуть максимального количества генерация на данном уровне")
+        return
     
 
 @bot.message_handler(commands=['start'])
 def handler_start(message):
     chat_id = message.chat.id
     user_name = message.from_user.username
-
-    bot.send_message(chat_id, "Здравствуй, " + user_name + "! Если у тебя уже есть ключ, то воспользуйся командой /activate")
+    if user_name is None:
+        bot.send_message(chat_id, "Здравствуй! Если у тебя уже есть ключ, то воспользуйся командой /activate")
+    else:
+        bot.send_message(chat_id, "Здравствуй, " + user_name + "! Если у тебя уже есть ключ, то воспользуйся командой /activate")
 
 @bot.message_handler(commands=['help'])
 def handler_help(message):
@@ -162,7 +168,7 @@ def handler_gen(message):
 
     if user_info != False:        
         if (user_info['lvl_1_payed'] == 1):
-            if user_info['lvl'] > 1 or (user_info['lvl'] == 1 and user_info['key_gen'] <= 4):
+            if user_info['lvl'] > 1 or (user_info['lvl'] == 1 and user_info['key_gen'] < 4):
                 bot.send_message(message.chat.id, "Введите PayPal и Email нового пользователя, ответив на это сообщение, в строго заданном формате, соблюдая пробелы.\n\nФормат:\npaypal@example.com mail@example.com") 
             else:
                 bot.send_message(message.chat.id, "Вы достигли максимального количества генераций на данном уровне, воспользуйтьесь командой /upgrade для повышения уровня") 
@@ -190,12 +196,16 @@ def handle_text(message):
     user_id = message.from_user.id
     user_name = message.from_user.username
 
-    if message.reply_to_message.text == activate_reply:      
-        key = message.text.strip()
-        activate(key, user_id, user_name, chat_id)    
+    try:
+        if message.reply_to_message.text != None:
+            if message.reply_to_message.text == activate_reply:      
+                key = message.text.strip()
+                activate(key, user_id, user_name, chat_id)    
 
-    if message.reply_to_message.text == gen_reply:
-        gen(message.text, user_id, user_name, chat_id)   
+            if message.reply_to_message.text == gen_reply:
+                gen(message.text, user_id, user_name, chat_id)   
+    except:
+        pass
     
 
 bot.polling()

@@ -1,5 +1,5 @@
 from paypalcheckoutsdk.payments import AuthorizationsCaptureRequest
-from paypal_client import PayPalClient
+from paypal.paypal_client import PayPalClient
 import json
 
 
@@ -30,5 +30,5 @@ class CaptureOrder(PayPalClient):
 """This is the driver function which invokes the capture order function with valid authorization id to capture.
  auth_id value should be replaced with an valid authorization id"""
 if __name__ == "__main__":
-    auth_id = '3GT23097V5824322L'
+    auth_id = '7M523757KD4215303'
     CaptureOrder().capture_order(auth_id, debug=True)

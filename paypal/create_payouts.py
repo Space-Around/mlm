@@ -37,7 +37,30 @@ class CreatePayouts(PayPalClient):
     def create_payouts(self, reciver_paypal_accaunt, amount, debug=False):
         request = PayoutsPostRequest()
         request.request_body(self.build_request_body(reciver_paypal_accaunt, amount, False))
-        response = self.client.execute(request)
+        try:
+            response = self.client.execute(request)
+            return response
+
+        except HttpError as httpe:
+            # Handle server side API failure
+            encoder = Encoder([Json()])
+            error = encoder.deserialize_response(httpe.message, httpe.headers)
+            print("Error: " + error["name"])
+            print("Error message: " + error["message"])
+            print("Information link: " + error["information_link"])
+            print("Debug id: " + error["debug_id"])
+            print("Details: ")
+            for detail in error["details"]:
+                print("Error location: " + detail["location"])
+                print("Error field: " + detail["field"])
+                print("Error issue: " + detail["issue"])
+                
+            return False
+
+        except IOError as ioe:
+            #Handle cient side connection failures
+            print(ioe.message)
+            return False
 
         if debug:
             print("Status Code: ", response.status_code)
@@ -54,7 +77,7 @@ class CreatePayouts(PayPalClient):
             #json_data = self.object_to_json(response.result)
             #print "json_data: ", json.dumps(json_data, indent=4)
         
-        return response
+        return False
 
     
     def create_payouts_failure(self, debug=False):

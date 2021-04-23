@@ -40,6 +40,17 @@
 #     print("PayPal: " + paypal_account)
 #     print("Email: " + email_account)
 
-param = """paypal@example.com email@example.com"""
+# param = """paypal@example.com email@example.com"""
 
-print(param.split()[0])
+# print(param.split()[0])
+
+import paypal
+
+# json_data_order, response = paypal.CreateOrder().create_order("", "16", debug=False)
+# print(response.result.links[1].href)
+
+# response = paypal.AuthorizeOrder().authorize_order("48N56332WF186591L", debug=True)
+# authorization_id = response.result.purchase_units[0].payments.authorizations[0].id
+# print(authorization_id)
+
+paypal.CaptureOrder().capture_order("8DX20580VW455474W", debug=True)
