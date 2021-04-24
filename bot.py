@@ -108,11 +108,13 @@ def upgrade(user_id, user_name, chat_id):
     
     elif user_info['lvl'] == 2 and user_info['key_gen'] == 8:
         action = "upgrade_to_lvl_3"
+        encrypted_key = aes.encrypt(user_info['key'] + " " + action)
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_3_AMOUNT, debug=False)
         bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)  
 
     elif user_info['lvl'] == 3 and user_info['key_gen'] == 33:
         action = "upgrade_to_lvl_4"
+        encrypted_key = aes.encrypt(user_info['key'] + " " + action)
         json_data_order, response = paypal.CreateOrder().create_order(encrypted_key, config.LVL_4_AMOUNT, debug=False)
         bot.send_message(chat_id, "Перейдите по ссылке для оплаты:\n" + response.result.links[1].href)
     else:
@@ -139,8 +141,14 @@ def handler_help(message):
 @bot.message_handler(commands=['activate'])
 def handler_activate(message):   
     chat_id = message.chat.id
+    user_id = message.from_user.id
 
-    bot.send_message(chat_id, "Втавьте ключ для его активации, ответив на это сообщение, активировав ключ Вы соглашаетесь со всеми условиями использования бота")
+    user_info = db.get_user_info_by_tg_id(user_id)
+
+    if user_info == False:
+        bot.send_message(chat_id, "Втавьте ключ для его активации, ответив на это сообщение, активировав ключ Вы соглашаетесь со всеми условиями использования бота")
+    else:
+        bot.send_message(chat_id, "Ваш ключ уже активирован")
 
 
 @bot.message_handler(commands=['upgrade'])
@@ -152,7 +160,7 @@ def handler_upgrade(message):
     user_info = db.get_user_info_by_tg_id(user_id)
 
     if user_info == False:
-        bot.send_message(chat_id, "Вы не можете генерировать ключи, так как Вас нету в системе, попросите Ваших друзей или знакомых сгенерировать ключ для Вас")
+        bot.send_message(chat_id, "Вы не можете использовать эту команду, так как Вас нету в системе")
         return
 
     if user_info['lvl'] == 4:
@@ -175,7 +183,7 @@ def handler_gen(message):
         else: 
             bot.send_message(message.chat.id, "Вы не можете генерировать ключи, актвируйте свой ключ при помощи команды /activate") 
     else:
-        bot.send_message(chat_id, "Вы не можете генерировать ключи, так как Вас нету в системе, попросите Ваших друзей или знакомых сгенерировать ключ для Вас")
+        bot.send_message(message.chat.id, "Вы не можете генерировать ключи, так как Вас нету в системе, попросите Ваших друзей или знакомых сгенерировать ключ для Вас")
 
 
 @bot.message_handler(commands=['info'])
@@ -184,7 +192,8 @@ def handler_info(message):
     chat_id = message.chat.id
     user_info = db.get_user_info_by_tg_id(user_id)
 
-    bot.send_message(chat_id, "Информация о ключе:\nУровень: " + str(user_info['lvl']) + "\nСгенерированно на данном уровне: " + str(user_info['key_gen']) + "\nКлюч: " + user_info['key'] + "\nPayPal: "+ user_info['paypal'] + "\nEmail: " + user_info['email'])
+    if user_info != False:
+        bot.send_message(chat_id, "Информация о ключе:\nУровень: " + str(user_info['lvl']) + "\nСгенерированно на данном уровне: " + str(user_info['key_gen']) + "\nКлюч: " + user_info['key'] + "\nPayPal: "+ user_info['paypal'] + "\nEmail: " + user_info['email'])
 
 
 @bot.message_handler(content_types=['text'])
@@ -195,9 +204,9 @@ def handle_text(message):
     chat_id = message.chat.id
     user_id = message.from_user.id
     user_name = message.from_user.username
-
+    
     try:
-        if message.reply_to_message.text != None:
+        if message.reply_to_message != None:
             if message.reply_to_message.text == activate_reply:      
                 key = message.text.strip()
                 activate(key, user_id, user_name, chat_id)    
@@ -205,7 +214,7 @@ def handle_text(message):
             if message.reply_to_message.text == gen_reply:
                 gen(message.text, user_id, user_name, chat_id)   
     except:
-        pass
+        bot.send_message(chat_id, "Произошла ошибка. Попробуйте ещё раз, если ошибка не исчезла, тогда обратитесь к администрации")
     
 
 bot.polling()
