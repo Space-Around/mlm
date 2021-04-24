@@ -44,7 +44,7 @@
 
 # print(param.split()[0])
 
-import paypal
+import db
 
 # json_data_order, response = paypal.CreateOrder().create_order("", "16", debug=False)
 # print(response.result.links[1].href)
@@ -53,4 +53,6 @@ import paypal
 # authorization_id = response.result.purchase_units[0].payments.authorizations[0].id
 # print(authorization_id)
 
-paypal.CaptureOrder().capture_order("8DX20580VW455474W", debug=True)
+# paypal.CaptureOrder().capture_order("8DX20580VW455474W", debug=True)
+
+print(db.DBConnection().get_user_info_by_key("xtwzbxejivtebeuq"))

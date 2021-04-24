@@ -1,2 +1,5 @@
 /__pycache__/
 /paypal/__pycache__/
+/db/__pycache__/
+/aes/__pycache__/
+test.py
