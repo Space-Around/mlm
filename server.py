@@ -17,7 +17,7 @@ bot = telebot.TeleBot(config.TOKEN)
 dbconn = db.DBConnection()
 
 WEBHOOK_PORT = 88  
-WEBHOOK_LISTEN = '10.168.0.6'
+WEBHOOK_LISTEN = '10.129.0.22'
 
 WEBHOOK_SSL_CERT = './ssh/webhook_cert.pem'  # Path to the ssl certificate
 WEBHOOK_SSL_PRIV = './ssh/webhook_pkey.pem'  # Path to the ssl private key
