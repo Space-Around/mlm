@@ -211,28 +211,32 @@ def upgrade(lvl, key, token):
 
 async def handle(request):
 
-    token = request.rel_url.query.get('token', '')
-    encrypted_key = request.rel_url.query.get('encrypted_key', '')
-    decrypted_data = aes.AESData().decrypt(encrypted_key)
+    try:
+        token = request.rel_url.query.get('token', '')
+        encrypted_key = request.rel_url.query.get('encrypted_key', '')
+        decrypted_data = aes.AESData().decrypt(encrypted_key)
 
-    key = decrypted_data.split()[0]
-    action = decrypted_data.split()[1]
+        key = decrypted_data.split()[0]
+        action = decrypted_data.split()[1]
 
-    text = "Дождитесь редиректа в telegram"
+        text = "Перейдите обратно в telegram чат"
 
-    if action == ACTIONE_ACTIVATE:
-        text = activate(key, token)
+        if action == ACTIONE_ACTIVATE:
+            text = activate(key, token)
 
-    if action == ACTIONE_UPGRADE_LVL_2:
-        text = upgrade(2, key, token)
+        if action == ACTIONE_UPGRADE_LVL_2:
+            text = upgrade(2, key, token)
 
-    if action == ACTIONE_UPGRADE_LVL_3:
-        text = text = upgrade(3, key, token)
+        if action == ACTIONE_UPGRADE_LVL_3:
+            text = text = upgrade(3, key, token)
 
-    if action == ACTIONE_UPGRADE_LVL_4:
-       text = upgrade(4, key, token)
-    
-    return web.Response(text=text)
+        if action == ACTIONE_UPGRADE_LVL_4:
+        text = upgrade(4, key, token)
+        
+        return web.Response(text=text)
+
+    except:
+        pass
 
 
 app = web.Application()
