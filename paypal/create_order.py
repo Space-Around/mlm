@@ -14,8 +14,8 @@ class CreateOrder(PayPalClient):
             {
                 "intent": "AUTHORIZE",
                 "application_context": {
-                    "return_url": "https://178.154.244.192:88/?paypal_auth=return&encrypted_key=" + encrypted_key,
-                    "cancel_url": "https://178.154.244.192:88/?paypal_auth=cancle&encrypted_key=" + encrypted_key
+                    "return_url": "https://178.154.244.147:88/?paypal_auth=return&encrypted_key=" + encrypted_key,
+                    "cancel_url": "https://178.154.244.147:88/?paypal_auth=cancle&encrypted_key=" + encrypted_key
                 },
                 "purchase_units": [
                     {
