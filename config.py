@@ -4,12 +4,12 @@ DATA_KEY = b"Sixteen byte key"
 
 DB_NAME = "./db/mlm.sqlite"
 
-LVL_1_AMOUNT = "1"
-LVL_2_AMOUNT = "2"
-LVL_3_AMOUNT = "3"
-LVL_4_AMOUNT = "4"
+LVL_1_AMOUNT = "65"
+LVL_2_AMOUNT = "130"
+LVL_3_AMOUNT = "520"
+LVL_4_AMOUNT = "8320"
 
-ADMINE_PAYPAL = "sb-239y86138543@personal.example.com"
+ADMINE_PAYPAL = "timofeevtimofey1992@gmail.com"
 
 ADMINE_TELEGRAM = "@mlmkeygen"
 ADMINE_EMAIL = "timofeevtimofey1992@gmail.com"

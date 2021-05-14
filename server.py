@@ -1,20 +1,30 @@
-# examples/server_simple.py
-from aiohttp import web
-import ssl
-import paypal
-import telebot
-import config
-import sqlite3
-import aes
-import datetime
-import json
-from dateutil.parser import parse
 import db
+import ssl
+import aes
 import time
+import json
+import paypal
+import config
+import telebot
+import logging
+import sqlite3
+import datetime
+from aiohttp import web
 from paypalhttp import HttpError
 
-bot = telebot.TeleBot(config.TOKEN)
-dbconn = db.DBConnection()
+_log_format = f"%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
+
+logging.basicConfig(filename="server.log", level=logging.ERROR, format=_log_format)
+
+try:
+    bot = telebot.TeleBot(config.TOKEN)
+    logging.info("start telegram bot")
+
+    dbconn = db.DBConnection()
+    logging.error("connecting to db")
+
+except BaseException as msg:
+    logging.error(msg)
 
 WEBHOOK_PORT = 88  
 WEBHOOK_LISTEN = '10.129.0.22'
@@ -31,31 +41,44 @@ def activate(key, token):
     try:
         response = paypal.AuthorizeOrder().authorize_order(token, debug=False)
 
+        logging.info("auth order | token: " + str(token))
+
         if response.status_code == 201:
             authorization_id = response.result.purchase_units[0].payments.authorizations[0].id
             response_capture = paypal.CaptureOrder().capture_order(authorization_id)
+            logging.info("capture order | authorization_id: " + str(authorization_id))
+
             access = False
             user_info = dbconn.get_user_info(key)
+            logging.info("get user info from db by key | key: " + str(key))
 
             user_info['lvl_1_payed'] = 1
             user_info['key_gen'] = 0
             user_info['lvl'] = 1
 
             dbconn.update_user_info(user_info)
+            logging.info("update user info in db | user_info: " + str(user_info))
 
             bot.send_message(user_info['tg_chat_id'], "Оплата прошла успешна. Активирован 1ый уровень.")        
+            logging.info("send message than successfull activation | chat_id: " + str(user_info['tg_chat_id']))
 
             seller = dbconn.get_user_info_by_id(user_info['seller_1_id'])              
+            logging.info("get seller info by id | id: " + str(user_info['seller_1_id']))
+
             create_response = paypal.CreatePayouts().create_payouts(seller['paypal'], config.LVL_1_AMOUNT, False)
+            logging.info("create payouts | seller_paypal: " + str(seller['paypal']) + " | amount: " + str(config.LVL_1_AMOUNT))
 
             if create_response.status_code == 201:
                 batch_id = create_response.result.batch_header.payout_batch_id
                 print('Retrieving Payouts batch with id: ' + batch_id)
                 get_response = paypal.GetPayouts().get_payouts(batch_id, False)
+                logging.info("get payouts | batch_id: " + str(batch_id))
+
                 if get_response.status_code == 200:
                     item_id = get_response.result.items[0].payout_item_id
                     print('Retrieving Payout item with id: ' + item_id)
                     get_item_response = paypal.GetPayoutItem().get_payout_item(item_id, False)
+                    logging.info("get payout item | item_id: " + str(item_id))
                     if get_item_response.status_code == 200:
                         print('Check Payouts status to see if it has completed processing all payments')
                         for i in range(5):
@@ -70,15 +93,20 @@ def activate(key, token):
                             print('Payouts batch is not processed yet')
 
                         if access:
+                            logging.info("payout success | batch_id: " + str(batch_id))
+
                             access = False
                             seller['key_gen'] = int(seller['key_gen']) + 1
 
                             dbconn.update_user_info(seller)
+                            logging.info("update seller info in db | seller_info: " + str(seller))
 
                             if user_info['tg_user_name'] is None:
                                 bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_id'] + " приобрёл ключ 1ого уровня за " + str(config.LVL_1_AMOUNT) + "$")
+                                logging.info("send message to seller that user payed activation | chat_id: " + str(seller['tg_chat_id'] + " | user_tg_id: " + str(user_info['tg_user_id'])))
                             else:
                                 bot.send_message(seller['tg_chat_id'], "Пользователь " + user_info['tg_user_name'] + " приобрёл ключ 1ого уровня за " + str(config.LVL_1_AMOUNT) + "$")                                
+                                logging.info("send message to seller that user payed activation | chat_id: " + str(seller['tg_chat_id']))
 
                         return "Перейдите в telegram"
                 else:
@@ -231,7 +259,7 @@ async def handle(request):
             text = text = upgrade(3, key, token)
 
         if action == ACTIONE_UPGRADE_LVL_4:
-        text = upgrade(4, key, token)
+            text = upgrade(4, key, token)
         
         return web.Response(text=text)
 
@@ -243,6 +271,7 @@ app = web.Application()
 app.add_routes([web.get('/', handle)])
 
 if __name__ == '__main__':
+    
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.load_cert_chain(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV)    
 
