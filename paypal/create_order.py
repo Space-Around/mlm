@@ -1,9 +1,9 @@
 from paypal.paypal_client import PayPalClient
 from paypalcheckoutsdk.orders import OrdersCreateRequest
 import json
+import logging
 
 _log_format = f"%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
-
 logging.basicConfig(filename="paypal.log", level=logging.ERROR, format=_log_format)
 
 class CreateOrder(PayPalClient):
