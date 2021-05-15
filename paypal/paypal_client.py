@@ -2,6 +2,7 @@ import os
 from paypalcheckoutsdk.core import PayPalHttpClient, SandboxEnvironment
 
 import sys
+import logging
 
 class PayPalClient:
     def __init__(self):

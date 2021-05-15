@@ -2,6 +2,9 @@ from paypal.paypal_client import PayPalClient
 from paypalcheckoutsdk.orders import OrdersCreateRequest
 import json
 
+_log_format = f"%(asctime)s - [%(levelname)s] - %(name)s - (%(filename)s).%(funcName)s(%(lineno)d) - %(message)s"
+
+logging.basicConfig(filename="paypal.log", level=logging.ERROR, format=_log_format)
 
 class CreateOrder(PayPalClient):
         
@@ -72,8 +75,9 @@ class CreateOrder(PayPalClient):
                 json_data = self.object_to_json(response.result)
                 print("json_data: ", json.dumps(json_data,indent=4))
             return json_data, response
-        except:
-            pass
+        except paypalhttp.http_error.HttpError as msg:
+            logging.error(msg)
+            
 
     """This function can be used to create an order with minimum required request body"""
     def create_order_with_minimum_payload(self, debug=False):
