@@ -40,7 +40,7 @@ def activate(key, user_id, user_name, chat_id):
                 logging.info("[activate] get user info by telegram id | user_id: " + str(user_id))
 
                 if seller != False:
-                    if user_info['seller_1_id'] == seller['id']:
+                    if int(user_info['seller_1_id']) == seller['id']:
                         bot.send_message(chat_id, "Вы не можете активировать ключ, который сами сгенерировали")
                         logging.info("[activate] send message that faild activation because own gen | chat_id: " + str(chat_id))
                         return  
@@ -50,7 +50,7 @@ def activate(key, user_id, user_name, chat_id):
                         logging.info("[activate] send message that failed activation because activation froud key | chat_id: " + str(chat_id))
                         return
 
-                    if user_info['lvl_1_payed'] == 1:                
+                    if int(user_info['lvl_1_payed']) == 1:                
                         bot.send_message(chat_id, "Ваш ключ уже активирован")
                         logging.info("[activate] send message that failed activation beacuse own key has active yet | chat_id: " + str(chat_id))
                         return                 
