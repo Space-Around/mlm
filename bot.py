@@ -217,10 +217,14 @@ def handler_activate(message):
 
         if user_info == False:
             bot.send_message(chat_id, "Втавьте ключ для его активации, ответив на это сообщение, активировав ключ Вы соглашаетесь со всеми условиями использования бота")
-            logging.info("[cmd activate] send message for key activation | chat_id: " + str(chat_id))
-        else:
-            bot.send_message(chat_id, "Ваш ключ уже активирован")
-            logging.info("[cmd activate] command activate, own key has activate yes | chat_id: " + str(chat_id))
+            logging.info("[cmd activate] send message for key activation | chat_id: " + str(chat_id))            
+        else: 
+            if user_info['lvl'] == 0:
+                bot.send_message(chat_id, "Втавьте ключ для его активации, ответив на это сообщение, активировав ключ Вы соглашаетесь со всеми условиями использования бота")
+                logging.info("[cmd activate] send message for key activation | chat_id: " + str(chat_id))
+            else:
+                bot.send_message(chat_id, "Ваш ключ уже активирован")
+                logging.info("[cmd activate] command activate, own key has activate yes | chat_id: " + str(chat_id))
 
     except BaseException as msg:
         logging.error(msg)
