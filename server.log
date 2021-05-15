@@ -1,0 +1,17 @@
+2021-05-15 13:47:35,102 - [ERROR] - root - (server.py).<module>(24) - connecting to db
+2021-05-15 13:47:35,149 - [ERROR] - asyncio - (base_events.py).default_exception_handler(1738) - unhandled exception during asyncio.run() shutdown
+task: <Task finished name='Task-1' coro=<_run_app() done, defined at C:\Python39\lib\site-packages\aiohttp\web.py:287> exception=OSError(10049, "error while attempting to bind on address ('10.129.0.22', 88): требуемый адрес для своего контекста неверен")>
+Traceback (most recent call last):
+  File "C:\Python39\lib\site-packages\aiohttp\web.py", line 508, in run_app
+    loop.run_until_complete(main_task)
+  File "C:\Python39\lib\asyncio\base_events.py", line 642, in run_until_complete
+    return future.result()
+  File "C:\Python39\lib\site-packages\aiohttp\web.py", line 411, in _run_app
+    await site.start()
+  File "C:\Python39\lib\site-packages\aiohttp\web_runner.py", line 121, in start
+    self._server = await loop.create_server(
+  File "C:\Python39\lib\asyncio\base_events.py", line 1494, in create_server
+    raise OSError(err.errno, 'error while attempting '
+OSError: [Errno 10049] error while attempting to bind on address ('10.129.0.22', 88): требуемый адрес для своего контекста неверен
+2021-05-15 13:47:35,180 - [ERROR] - root - (server.py).<module>(309) - [Errno 10049] error while attempting to bind on address ('10.129.0.22', 88): требуемый адрес для своего контекста неверен
+2021-05-15 13:49:24,812 - [ERROR] - root - (server.py).<module>(24) - connecting to db

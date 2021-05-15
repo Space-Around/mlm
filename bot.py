@@ -74,7 +74,8 @@ def activate(key, user_id, user_name, chat_id):
                 logging.info("[activate] send message with paypal link | chat_id: " + str(chat_id))
             else:
                 bot.send_message(chat_id, "Такого ключа не существует")           
-                 logging.info("[activate] send message that key doesnt exist | chat_id: " + str(chat_id))
+                logging.info("[activate] send message that key doesnt exist | chat_id: " + str(chat_id))
+
         else:
             bot.send_message(chat_id, "Неверный формат ключа")
             logging.info("[activate] send message that invalid key format | chat_id: " + str(chat_id))
@@ -137,7 +138,7 @@ def gen(data, user_id, user_name, chat_id):
             logging.info("[gen] send message with new gen key | chat_id: " + str(chat_id))
 
     except BaseException as msg:
-    logging.error(msg)
+        logging.error(msg)
 
 def upgrade(user_id, user_name, chat_id):
     try:
