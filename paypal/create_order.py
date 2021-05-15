@@ -51,26 +51,29 @@ class CreateOrder(PayPalClient):
 
     """This function can be used to create an order with complete request body"""
     def create_order(self, encrypted_key, amount, debug=False):
-        request = OrdersCreateRequest()
-        request.headers['prefer'] = 'return=representation'
-        request.request_body(self.build_complete_request_body(encrypted_key, amount))
-        response = self.client.execute(request)
-        json_data = self.object_to_json(response.result)
-
-        if debug:
-            print('Order With Complete Payload:')
-            print('Status Code:', response.status_code)
-            print('Status:', response.result.status)
-            print('Order ID:', response.result.id)
-            print('Intent:', response.result.intent)
-            print('Links:')
-            for link in response.result.links:
-                print('\t{}: {}\tCall Type: {}'.format(link.rel, link.href, link.method))
-            print('Total Amount: {} {}'.format(response.result.purchase_units[0].amount.currency_code,
-                                               response.result.purchase_units[0].amount.value))
+        try:
+            request = OrdersCreateRequest()
+            request.headers['prefer'] = 'return=representation'
+            request.request_body(self.build_complete_request_body(encrypted_key, amount))
+            response = self.client.execute(request)
             json_data = self.object_to_json(response.result)
-            print("json_data: ", json.dumps(json_data,indent=4))
-        return json_data, response
+
+            if debug:
+                print('Order With Complete Payload:')
+                print('Status Code:', response.status_code)
+                print('Status:', response.result.status)
+                print('Order ID:', response.result.id)
+                print('Intent:', response.result.intent)
+                print('Links:')
+                for link in response.result.links:
+                    print('\t{}: {}\tCall Type: {}'.format(link.rel, link.href, link.method))
+                print('Total Amount: {} {}'.format(response.result.purchase_units[0].amount.currency_code,
+                                                response.result.purchase_units[0].amount.value))
+                json_data = self.object_to_json(response.result)
+                print("json_data: ", json.dumps(json_data,indent=4))
+            return json_data, response
+        except:
+            pass
 
     """This function can be used to create an order with minimum required request body"""
     def create_order_with_minimum_payload(self, debug=False):
