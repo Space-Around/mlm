@@ -5,8 +5,8 @@ import sys
 
 class PayPalClient:
     def __init__(self):
-        self.client_id =  os.environ["PAYPAL_CLIENT_ID"] if 'PAYPAL_CLIENT_ID' in os.environ else "ARuvP-lX2MaFH0AEqmVwb8x11GhUI54TbYPlgfZCASRfMkHvE4bWbQbPqfZTs6WbZRY4VgixFSGPnd7m"
-        self.client_secret = os.environ["PAYPAL_CLIENT_SECRET"] if 'PAYPAL_CLIENT_SECRET' in os.environ else "EPmXjofU4S1nHVVrlQ7S3Llr9aivc4JMJVjjvMJoHg5JhkhoL4f7gNrQzTOXXsTlqCrdD0NxxL4HgNMe"
+        self.client_id =  os.environ["PAYPAL_CLIENT_ID"] if 'PAYPAL_CLIENT_ID' in os.environ else "AabhYx_yX25pZ_lHFSb8lQ2dAHao4FZ0kaCTvOP8I7uxWOT05_23nvehYLBvmrrZQsE4aZW706KAB4Ph"
+        self.client_secret = os.environ["PAYPAL_CLIENT_SECRET"] if 'PAYPAL_CLIENT_SECRET' in os.environ else "EHZyuOP0luhjJ_xXTQ6Yh1JJrsTAz6Ik-Ebf4FP_uDUa3Mb52ZotHeI-0VCs6wSBqBel3UtWizBxoztx"
 
         """Setting up and Returns PayPal SDK environment with PayPal Access credentials.
            For demo purpose, we are using SandboxEnvironment. In production this will be
